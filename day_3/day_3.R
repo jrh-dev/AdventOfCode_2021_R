@@ -1,4 +1,4 @@
-input <- readLines("C:/Users/jamesh07/Desktop/AdventOfCode_2021_R/day_3/day_3.txt", warn = FALSE)
+input <- readLines("day_3/day_3.txt", warn = FALSE)
 
 # Part 1
 catch_gamma <- catch_epsilon <- vector(mode = 'list', length = nchar(input[1]))
@@ -32,4 +32,5 @@ for (ii in seq_len(nchar(i.y[1]))) {
   if(length(i.y) == 1) {break}
 }
 
+# Part 2 answer
 print(bin2dec(i.x) * bin2dec(i.y))
