@@ -21,7 +21,7 @@ Intersections <- function (input, diag = FALSE) {
     }
   }
   )
-  return(sum(table(unlist(out, TRUE)) >= 2))
+  return(sum(table(unlist(out)) >= 2))
 }
 
 # Part 1 answer
