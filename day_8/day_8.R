@@ -3,8 +3,6 @@ input <- strsplit(readLines("day_8.txt", warn = FALSE), " ")
 # Part 1 answer
 sum(unlist(lapply(input, function(x) nchar(x[12:15]))) %in% c(2, 3, 4, 7))
 
-
-
 .WhatNumber <- function(t_1, test, ip_1) {
  
   c1 <- ip_1[nchar(ip_1) == 2]
@@ -51,9 +49,8 @@ sum(unlist(lapply(input, function(x) nchar(x[12:15]))) %in% c(2, 3, 4, 7))
   return(is)
 }
 
-
 Decoder <- function(ip_1, ip_2) {
-  
+ 
   catch <- rep(NA, 4)
   
   for (ii in 1:4) {
@@ -63,7 +60,6 @@ Decoder <- function(ip_1, ip_2) {
       ip_1 = ip_1
     )
   }
-  
   return(as.numeric(paste0(catch, collapse = "")))
 }
 
