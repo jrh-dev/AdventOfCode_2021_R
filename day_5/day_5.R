@@ -1,7 +1,7 @@
 coord <- strsplit(readLines("day_5.txt", warn = FALSE), " -> ")
 
 Intersections <- function (input, diag = FALSE) {
-  out <- lapply(step1, function(z) {
+  out <- lapply(input, function(z) {
     
     x = as.numeric(gsub(".*,", "", z))
     y = as.numeric(gsub(",.*", "", z))
@@ -21,7 +21,7 @@ Intersections <- function (input, diag = FALSE) {
     }
   }
   )
-  return(sum(table(unlist(out, TRUE)) >= 2))
+  return(sum(table(unlist(out)) >= 2))
 }
 
 # Part 1 answer
