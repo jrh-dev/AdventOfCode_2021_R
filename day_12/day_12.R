@@ -6,7 +6,7 @@ moves <- data.frame(
   y = c(unlist(lapply(input, function(x) x[2])), unlist(lapply(input, function(x) x[1])))
 )
 
-# Prevent 'starting' with end or ending with 'start'
+# Prevent starting with 'end' or ending with 'start'
 moves <- moves[moves$x != "end" & moves$y != "start",]
 
 all_caves <- unique(c(moves$x, moves$y))
