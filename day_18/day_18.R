@@ -1,130 +1,134 @@
-
-[[[[4,3],4],4],[7,[[8,4],9]]] + [1,1]
-
 Combine = function (lhs, rhs) {
-    return(paste0("[", lhs, ",", rhs,"]"))
+    return(unlist(strsplit(paste0("[", lhs, ",", rhs,"]"), "")))
 }
 
-# example s
-Combine("[[[[4,3],4],4],[7,[[8,4],9]]]","[1,1]")
-
-[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]
-#example e
 
 
-input = Combine("[[[[4,3],4],4],[7,[[8,4],9]]]","[1,1]")
+# Find an number explode - always first thing to try
+FindExp <- function(input) {
+    
+    out = c(NA, NA)
 
-Explo <- function(input) {
-    keep_running <- TRUE
+    for (ii in 1:(length(input) - 4)) {
 
-    while (keep_running) {
-        bkt_cnt <- 0
-        to_exp <- NULL
+        catch = paste0(input[ii:(ii + 4)], collapse = "")
 
-        for (ii in 1:nchar(input)) {
-            if (substr(input, ii, ii) == "[") bkt_cnt <- bkt_cnt + 1
-            if (substr(input, ii, ii) == "]") bkt_cnt <- bkt_cnt - 1
+        check <- grepl("\\[(\\d{1,2},\\d{1,2})\\]", catch)
 
-            if (bkt_cnt >= 5 & grepl("^[0-9{2},0-9{2}]+$", substr(input, ii, ii + 4))) {
-                to_exp <- substr(input, ii, ii + 4)
-                at_pos <- ii
-                gap <- 7
+        if (check) {
+
+            test = input[1:ii]
+
+            lhb = length(test[test == "["])
+            rhb = length(test[test == "]"])
+
+            if (lhb - rhb >= 5) {
+                out = c(ii, ii + 4)
                 break
             }
-
-            if (bkt_cnt >= 5 & grepl("^[0-9{2},0-9{1}]+$", substr(input, ii, ii + 3))) {
-                to_exp <- substr(input, ii, ii + 3)
-                at_pos <- ii
-                gap <- 6
-                break
-            }
-
-            if (bkt_cnt >= 5 & grepl("^[0-9{1},0-9{2}]+$", substr(input, ii, ii + 3))) {
-                to_exp <- substr(input, ii, ii + 3)
-                at_pos <- ii
-                gap <- 6
-                break
-            }
-
-            if (bkt_cnt >= 5 & grepl("^[0-9{1},0-9{1}]+$", substr(input, ii, ii + 2))) {
-                to_exp <- substr(input, ii, ii + 2)
-                at_pos <- ii
-                gap <- 5
-                break
-            }
-        }
-
-        if (!is.null(to_exp)) {
-            input <- paste0(substr(input, 1, at_pos - 2), "0", substr(input, at_pos + gap - 1, nchar(input)))
-
-
-            pre_is <- NULL
-            pre_at_pos <- NULL
-            prelen <- NULL
-
-            for (jj in (at_pos - 2):1) {
-                if (grepl("[1-9]{1}", substr(input, jj, jj))) {
-                    pre_is <- substr(input, jj, jj)
-                    pre_at_pos <- jj
-                    prelen <- 1
-                    break
-                }
-            }
-
-            if (!is.null(pre_at_pos)) {
-                if (grepl("[1-9]{2}", substr(input, pre_at_pos - 1, pre_at_pos))) {
-                    pre_is <- substr(input, pre_at_pos - 1, pre_at_pos)
-                    pre_at_pos <- pre_at_pos - 1
-                    prelen <- 2
-                }
-            }
-
-            if (is.null(pre_is)) {
-                input <- paste0(substr(input, 1, at_pos - 2), substr(input, at_pos - 1, nchar(input)))
-            }
-
-            if (!is.null(pre_is)) {
-                input <- paste0(substr(input, 1, pre_at_pos - 1), as.numeric(sub("\\,.*", "", to_exp)) + as.numeric(pre_is), substr(input, pre_at_pos + prelen, nchar(input)))
-            }
-
-
-
-            post_is <- NULL
-            post_at_pos <- NULL
-            postlen <- NULL
-
-            for (jj in (at_pos + 1):nchar(input)) {
-                if (grepl("[1-9]{1}", substr(input, jj, jj))) {
-                    post_is <- substr(input, jj, jj)
-                    post_at_pos <- jj
-                    postlen <- 1
-                    break
-                }
-            }
-
-            if (!is.null(pre_at_pos)) {
-                if (grepl("[1-9]{2}", substr(input, post_at_pos, post_at_pos + 1))) {
-                    post_is <- substr(input, post_at_pos - 1, post_at_pos)
-                    postlen <- 2
-                }
-            }
-
-            if (is.null(post_is)) {
-                input <- paste0(substr(input, 1, at_pos), ",0", substr(input, at_pos + 1, nchar(input)))
-            }
-
-            if (!is.null(post_is)) {
-                input <- paste0(substr(input, 1, post_at_pos - 1), as.numeric(sub(".*\\,", "", to_exp)) + as.numeric(post_is), substr(input, post_at_pos + postlen, nchar(input)))
-            }
-        } else {
-            keep_running <- FALSE
         }
     }
+
+    return(out)
+}
+
+
+
+Explo = function(input, pos) {
+
+    lhs_num = input[pos[1] + 1]
+
+    rhs_num = input[pos[2] - 1]
+
+    lhs = input[1:(pos[1] - 1)]
+
+    rhs = input[(pos[2] + 1):length(input)]
+
+    lhs_loc = length(lhs) - stringr::str_locate(paste0(rev(lhs), collapse = ""), "\\d{1,2}")[1] + 1
+
+    rhs_loc = stringr::str_locate(paste0(rhs, collapse = ""), "\\d{1,2}")[1]
+
+    if (!is.na(lhs_loc)) {
+        lhs[lhs_loc] = as.numeric(lhs[lhs_loc]) + as.numeric(lhs_num)
+    }
+
+    if (!is.na(rhs_loc)) {
+        rhs[rhs_loc] = as.numeric(rhs[rhs_loc]) + as.numeric(rhs_num)
+    }
+
+    out = c(lhs, "0", rhs)
+
+}
+
+FindSpli = function(input) {
+
+    out = stringr::str_locate(paste0(input, collapse = ""), "\\d{2}")[1]
+
+    return(out)
+}
+
+Splito <- function(input, pos) {
+    rep_wi <- as.numeric(input[pos])
+
+    rep_wi <- c("[", floor(rep_wi / 2), ",", ceiling(rep_wi / 2), "]")
+
+    out <- c(input[1:(pos - 1)], rep_wi, input[(pos + 1):length(input)])
+
+    return(out)
+}
+
+
+
+ReduceNums <- function(input) {
+    outer_run <- TRUE
+
+    while (outer_run) {
+        inner_run <- TRUE
+        exp_pos <- FindExp(input)
+        if (is.na(exp_pos[1])) inner_run <- FALSE
+
+        while (inner_run) {
+            input <- Explo(input, exp_pos)
+            exp_pos <- FindExp(input)
+            if (is.na(exp_pos[1])) inner_run <- FALSE
+        }
+
+        spli_pos <- FindSpli(input)
+
+        if (!is.na(FindSpli(input)[1])) input <- Splito(input, spli_pos)
+
+        if (is.na(FindExp(input)[1]) & is.na(FindSpli(input)[1])) outer_run <- FALSE
+    }
+
     return(input)
 }
 
+Magneto <- function(input) {
+    
+    input = paste0(input, collapse = "")
 
-t1 = Explo(Combine("[[[[4,3],4],4],[7,[[8,4],9]]]","[1,1]"))
+    input = gsub("\\[", "(", input)
+    input = gsub("\\]", ")", input)
+    input = gsub(",", "*3+2*", input)
+
+    return(eval(parse(text = input)))
+}
 
 
+source <- readLines("C:/Users/jamesh07/Desktop/Tmp/day_18.txt", warn = FALSE)
 
+run_sum = source[1]
+
+for (jj in 2:length(source)) {
+
+    run_sum = ReduceNums(Combine(paste0(run_sum, collapse = ""), source[jj]))
+
+}
+
+Magneto(run_sum)
+
+biggest = expand.grid(a = as.character(source), b = as.character(source))
+
+biggest = biggest[biggest$a != biggest$b,]
+
+biggest$mag = ReduceNums(Combine(biggest$a, biggest$b))
