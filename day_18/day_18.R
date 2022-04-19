@@ -1,10 +1,9 @@
+# Combine 2 numbers into the pair format
 Combine = function (lhs, rhs) {
     return(unlist(strsplit(paste0("[", lhs, ",", rhs,"]"), "")))
 }
 
-
-
-# Find an number explode - always first thing to try
+# Find the position of the 1st number to explode
 FindExp <- function(input) {
     
     out = c(NA, NA)
@@ -32,8 +31,7 @@ FindExp <- function(input) {
     return(out)
 }
 
-
-
+# Perform the explode
 Explo = function(input, pos) {
 
     lhs_num = input[pos[1] + 1]
@@ -60,6 +58,7 @@ Explo = function(input, pos) {
 
 }
 
+# Find position of first number to split
 FindSpli = function(input) {
 
     out = stringr::str_locate(paste0(input, collapse = ""), "\\d{2}")[1]
@@ -67,6 +66,7 @@ FindSpli = function(input) {
     return(out)
 }
 
+# Perform the split
 Splito <- function(input, pos) {
     rep_wi <- as.numeric(input[pos])
 
@@ -77,8 +77,7 @@ Splito <- function(input, pos) {
     return(out)
 }
 
-
-
+# Wrapper to perform whole operation of reduction
 ReduceNums <- function(input) {
     outer_run <- TRUE
 
@@ -103,6 +102,7 @@ ReduceNums <- function(input) {
     return(input)
 }
 
+# Get the magnitude of a reduced number
 Magneto <- function(input) {
     
     input = paste0(input, collapse = "")
@@ -114,8 +114,8 @@ Magneto <- function(input) {
     return(eval(parse(text = input)))
 }
 
-
-source <- readLines("C:/Users/jamesh07/Desktop/Tmp/day_18.txt", warn = FALSE)
+# Read puzzle input
+source <- readLines("G:\\Coding\\AdventOfCode_2021_R\\day_18\\day_18.txt", warn = FALSE)
 
 run_sum = source[1]
 
@@ -125,10 +125,20 @@ for (jj in 2:length(source)) {
 
 }
 
+# Part 1 answer
 Magneto(run_sum)
 
+# Get all possible sums as a data/frame
 biggest = expand.grid(a = as.character(source), b = as.character(source))
 
 biggest = biggest[biggest$a != biggest$b,]
 
-biggest$mag = ReduceNums(Combine(biggest$a, biggest$b))
+catch_mag = vector(mode = "numeric", length = nrow(biggest))
+
+for (xx in 1:nrow(biggest)) {
+    catch_mag[xx] = Magneto(ReduceNums(Combine(biggest$a[xx], biggest$b[xx])))
+    print(xx)
+}
+
+# Part 2 answer
+max(catch_mag)
