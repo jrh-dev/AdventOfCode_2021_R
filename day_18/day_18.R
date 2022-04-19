@@ -115,7 +115,7 @@ Magneto <- function(input) {
 }
 
 # Read puzzle input
-source <- readLines("G:\\Coding\\AdventOfCode_2021_R\\day_18\\day_18.txt", warn = FALSE)
+source <- readLines("day_18/day_18.txt", warn = FALSE)
 
 run_sum = source[1]
 
