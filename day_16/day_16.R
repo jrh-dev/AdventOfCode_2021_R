@@ -21,7 +21,7 @@ hex_dict <- c(
 
 input <- "9C0141080250320F1802104A08"
 
-input <- readLines("/home/friday/Documents/Coding/AdventOfCode_2021_R/day_16/day_16.txt", warn = FALSE)
+input <- readLines("day_16/day_16.txt", warn = FALSE)
 
 ParseInput <- function(str, dict) {
   str <- strsplit(str, "")
